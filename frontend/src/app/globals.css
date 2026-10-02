@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  @apply bg-stone-100 font-sans text-stone-900;
+}
+
+@page {
+  margin: 0.75in;
+}
+
+/* ---------- Agreement document (rendered from JSX and template markdown) ---------- */
+
+.nda-document {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #1c1917;
+}
+
+.nda-document h1 {
+  @apply mb-6 text-center text-2xl font-bold;
+}
+
+.nda-document h3 {
+  @apply mt-6 mb-1 font-sans text-xs font-semibold tracking-wider text-stone-500 uppercase;
+}
+
+.nda-document p {
+  @apply my-2;
+}
+
+.nda-document a {
+  @apply text-indigo-700 underline;
+}
+
+.nda-document ol {
+  @apply my-4 list-decimal space-y-3 pl-6 text-justify;
+}
+
+.nda-checklist {
+  @apply my-2 space-y-1;
+}
+
+.nda-signatures {
+  @apply mt-6 w-full border-collapse text-sm;
+  break-inside: avoid;
+}
+
+.nda-signatures th,
+.nda-signatures td {
+  @apply border border-stone-300 px-3 py-2 text-left align-top;
+}
+
+.nda-signatures thead th {
+  @apply text-center font-sans text-xs tracking-wider;
+}
+
+.nda-signatures tbody th {
+  @apply w-36 font-sans text-xs font-medium text-stone-600;
+}
+
+.nda-signatures tbody tr:first-child td {
+  @apply h-14;
+}
+
+.nda-attribution {
+  @apply mt-6 text-xs text-stone-500;
+}
+
+/* Fields still to be filled in. */
+.nda-placeholder {
+  @apply rounded bg-amber-100 px-1 text-amber-800;
+}
+
+/* Values substituted from the cover page into the Standard Terms. */
+.nda-filled {
+  @apply rounded bg-indigo-50 px-0.5 font-semibold;
+}
+
+/* Defined terms whose values appear on the cover page. */
+.nda-coverpage-ref {
+  @apply font-semibold;
+}
+
+.nda-page-break {
+  @apply my-10 border-t border-dashed border-stone-300;
+  break-after: page;
+}
+
+@media print {
+  .nda-placeholder,
+  .nda-filled {
+    @apply bg-transparent p-0 text-inherit;
+  }
+
+  .nda-page-break {
+    @apply m-0 border-0;
+  }
+
+  /* Chrome clips the last pixel at the printable area's right edge, which
+     would drop the table's right border. */
+  .nda-signatures {
+    width: calc(100% - 1px);
+  }
+
+  .nda-document a {
+    @apply text-inherit no-underline;
+  }
+}
