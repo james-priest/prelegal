@@ -1,0 +1,62 @@
+[
+  {
+    "name": "AI Addendum",
+    "description": "Addendum to a services agreement governing a provider's AI services, including use of customer Input and generated Output, restrictions, and model training rights.",
+    "filename": "templates/AI-Addendum.md"
+  },
+  {
+    "name": "Business Associate Agreement",
+    "description": "HIPAA Business Associate Agreement setting out how a provider may use, disclose, and safeguard protected health information (PHI) on behalf of a customer.",
+    "filename": "templates/BAA.md"
+  },
+  {
+    "name": "Cloud Service Agreement",
+    "description": "Standard terms for selling and buying cloud software and SaaS products, covering access and use, support, fees, data, warranties, liability, and term.",
+    "filename": "templates/CSA.md"
+  },
+  {
+    "name": "Data Processing Agreement",
+    "description": "Agreement governing a provider's processing of customer personal data as processor or subprocessor, addressing GDPR and other data protection requirements.",
+    "filename": "templates/DPA.md"
+  },
+  {
+    "name": "Design Partner Agreement",
+    "description": "Agreement giving an early design partner access to a product in development in exchange for feedback and participation in the provider's program.",
+    "filename": "templates/design-partner-agreement.md"
+  },
+  {
+    "name": "Mutual Non-Disclosure Agreement",
+    "description": "Standard terms of a mutual NDA allowing both parties to share confidential information for a stated purpose while protecting it from further disclosure.",
+    "filename": "templates/Mutual-NDA.md"
+  },
+  {
+    "name": "Mutual Non-Disclosure Agreement Cover Page",
+    "description": "Cover page for the Mutual NDA capturing the purpose, effective date, MNDA term, confidentiality term, governing law, jurisdiction, and any modifications to the standard terms.",
+    "filename": "templates/Mutual-NDA-coverpage.md"
+  },
+  {
+    "name": "Partnership Agreement",
+    "description": "Agreement for business partnerships covering each party's obligations, feedback, trademark licensing, payments, confidentiality, and liability.",
+    "filename": "templates/Partnership-Agreement.md"
+  },
+  {
+    "name": "Pilot Agreement",
+    "description": "Short-term agreement letting a prospective customer evaluate a product or service before committing to a full commercial contract.",
+    "filename": "templates/Pilot-Agreement.md"
+  },
+  {
+    "name": "Professional Services Agreement",
+    "description": "Agreement for professional services performed under statements of work (SOWs), covering deliverables, cooperation, fees, IP ownership, and liability.",
+    "filename": "templates/psa.md"
+  },
+  {
+    "name": "Service Level Agreement",
+    "description": "Service level terms used with the Cloud Service Agreement defining target uptime, uptime calculation, support response times, and service credits.",
+    "filename": "templates/sla.md"
+  },
+  {
+    "name": "Software License Agreement",
+    "description": "Standard terms for licensing installable software, covering license grant, permitted uses, user accounts, fees, warranties, liability, and term.",
+    "filename": "templates/Software-License-Agreement.md"
+  }
+]
