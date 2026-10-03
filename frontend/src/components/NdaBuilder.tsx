@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
 import CoverPage from "@/components/CoverPage";
 import NdaForm from "@/components/NdaForm";
@@ -44,16 +45,21 @@ export default function NdaBuilder({ standardTerms }: { standardTerms: string })
     <div className="flex min-h-screen flex-col bg-stone-100 print:bg-white">
       <header className="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-4 print:hidden">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-indigo-600">Prelegal</p>
-          <h1 className="text-lg font-semibold text-stone-900">Mutual NDA Creator</h1>
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand-blue">Prelegal</p>
+          <h1 className="text-lg font-semibold text-brand-navy">Mutual NDA Creator</h1>
         </div>
-        <button
-          type="button"
-          onClick={downloadPdf}
-          className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          Download PDF
-        </button>
+        <div className="flex items-center gap-4">
+          <Link href="/" className="text-sm font-medium text-brand-gray hover:text-brand-navy">
+            Sign out
+          </Link>
+          <button
+            type="button"
+            onClick={downloadPdf}
+            className="rounded-md bg-brand-purple px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-purple/90 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:ring-offset-2"
+          >
+            Download PDF
+          </button>
+        </div>
       </header>
 
       <main className="grid flex-1 lg:grid-cols-[minmax(22rem,28rem)_1fr] print:block">
