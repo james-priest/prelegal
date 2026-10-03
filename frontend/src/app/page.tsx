@@ -1,12 +1,14 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-import NdaBuilder from "@/components/NdaBuilder";
+import LoginForm from "@/components/LoginForm";
 
-// The repo-level templates/ directory is the single source of truth for
-// agreement text. It is read at build time, when this page is prerendered.
-const STANDARD_TERMS_PATH = path.join(process.cwd(), "..", "templates", "Mutual-NDA.md");
-
-export default async function Home() {
-  const standardTerms = await readFile(STANDARD_TERMS_PATH, "utf8");
-  return <NdaBuilder standardTerms={standardTerms} />;
+export default function LoginPage() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-stone-100 p-4">
+      <div className="w-full max-w-sm rounded-lg bg-white p-8 shadow-lg ring-1 ring-stone-200">
+        <p className="text-xs font-semibold uppercase tracking-widest text-brand-blue">Prelegal</p>
+        <h1 className="mt-1 text-2xl font-semibold text-brand-navy">Sign in</h1>
+        <p className="mt-2 mb-6 text-sm text-brand-gray">Draft common legal agreements in minutes.</p>
+        <LoginForm />
+      </div>
+    </main>
+  );
 }

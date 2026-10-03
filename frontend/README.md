@@ -1,6 +1,6 @@
 # Prelegal frontend
 
-Next.js app for drafting legal agreements. It currently provides the **Mutual NDA Creator**: fill in the cover page details in a form, see the completed Common Paper Mutual NDA update live, and download it as a PDF.
+Next.js app for drafting legal agreements. It is statically exported (`out/`) and served by the backend. It currently provides a placeholder sign-in page (`/`) and the **Mutual NDA Creator** (`/nda/`): fill in the cover page details in a form, see the completed Common Paper Mutual NDA update live, and download it as a PDF.
 
 ## Getting started
 
@@ -14,15 +14,15 @@ npm run dev        # http://localhost:3000
 | Script               | Purpose                          |
 | -------------------- | -------------------------------- |
 | `npm run dev`        | Start the dev server             |
-| `npm run build`      | Production build (static page)   |
-| `npm start`          | Serve the production build       |
+| `npm run build`      | Static export to `out/`          |
 | `npm run lint`       | ESLint                           |
 | `npm test`           | Run Vitest unit tests once       |
 | `npm run test:watch` | Run Vitest in watch mode         |
 
 ## How it works
 
-- `src/app/page.tsx` — server component that reads `templates/Mutual-NDA.md` (the Standard Terms) and renders the builder.
+- `src/app/page.tsx` + `src/components/LoginForm.tsx` — fake sign-in; submitting goes straight to `/nda/`.
+- `src/app/nda/page.tsx` — server component that reads `templates/Mutual-NDA.md` (the Standard Terms) and renders the builder.
 - `src/components/NdaBuilder.tsx` — holds form state; lays out the form beside the live preview. **Download PDF** calls `window.print()`; print styles hide everything except the agreement, so users choose "Save as PDF".
 - `src/components/NdaForm.tsx` — the cover page form.
 - `src/components/CoverPage.tsx` — the filled-in cover page (mirrors `templates/Mutual-NDA-coverpage.md`).
