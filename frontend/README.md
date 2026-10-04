@@ -1,6 +1,6 @@
 # Prelegal frontend
 
-Next.js app for drafting legal agreements. It is statically exported (`out/`) and served by the backend. It provides a placeholder sign-in page (`/`) and the drafting page (`/draft/`): chat with an AI assistant that picks a supported document and fills in its cover page, see the completed agreement update live, and download it as a PDF.
+Next.js app for drafting legal agreements. It is statically exported (`out/`) and served by the backend. Pages: sign in (`/`), sign up (`/signup/`), your documents (`/documents/`) and drafting (`/draft/`, or `/draft/?id=…` for a saved draft): chat with an AI assistant that picks a supported document and fills in its cover page, see the agreement update live, and download it as a PDF.
 
 ## Getting started
 
@@ -21,10 +21,12 @@ npm run dev        # http://localhost:3000
 
 ## How it works
 
-- `src/app/page.tsx` + `src/components/LoginForm.tsx` — fake sign-in; submitting goes straight to `/draft/`.
-- `src/app/draft/page.tsx` — server component that reads `templates/documents.json` (the supported documents) and each template's Standard Terms at build time, and renders the builder.
-- `src/components/DocumentBuilder.tsx` — holds the draft state (chosen document, fields, parties); lays out the chat beside the live preview. **Download PDF** calls `window.print()`; print styles hide everything except the agreement, so users choose "Save as PDF".
-- `src/components/Chat.tsx` — the chat; each AI turn returns a reply, the chosen document and field and party updates.
-- `src/components/CoverPage.tsx` — generic cover page: each key term with its value or a placeholder, and a signature block per party.
+- `src/app/page.tsx`, `src/app/signup/page.tsx` — `AuthLayout` (brand panel with a sample cover page) around `AuthForm` (sign in or sign up, then `/documents/`).
+- `src/components/AppShell.tsx` — signed-in top bar; sends signed-out visitors to `/`.
+- `src/app/documents/page.tsx` + `src/components/DocumentList.tsx` — the user's drafts, most recent first.
+- `src/app/draft/page.tsx` — reads `templates/documents.json` and each template's Standard Terms at build time (`src/lib/server/templates.ts`). `DraftPage` keys `DocumentBuilder` by `?id=`.
+- `src/components/DocumentBuilder.tsx` — owns the draft and chat messages; after each turn with a chosen document it creates (then updates) the saved draft. Lays out the chat beside the live preview, filling the window. **Download PDF** calls `window.print()`; print styles hide everything except the agreement.
+- `src/components/Chat.tsx` — the conversation and message input.
+- `src/components/CoverPage.tsx` — key terms, signature block per party, and the draft disclaimer (printed).
 - `src/components/StandardTerms.tsx` — renders a template's markdown. `<span class="…_link">` references show inline field values (the NDA's Governing Law and Jurisdiction) or render as defined terms. User input is rendered as text, never HTML.
-- `src/lib/documents.ts` — document and draft types and helpers; `src/lib/chat.ts` — `/api/chat` client and `applyResponse`.
+- `src/lib/` — `api.ts` (fetch helper), `auth.ts`, `drafts.ts`, `chat.ts` (`/api/chat` client and `applyResponse`), `documents.ts` (types and helpers).

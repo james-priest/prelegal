@@ -13,12 +13,14 @@ Code is organized by layer: `api` calls `services`, which use `models` and `core
 | Path                    | Contents |
 | ----------------------- | -------- |
 | `main.py`               | `create_app(settings)`: lifespan (recreates the DB), routers, static mount |
-| `api/`                  | Routers, request/response handling only: `health` (`GET /api/health`), `chat` (`POST /api/chat`) |
-| `services/database.py`  | SQLite, deleted and recreated with a `users` table on every startup |
+| `api/`                  | Routers, request/response handling only: `health`, `auth` (`/api/auth/signup`, `signin`, `signout`, `me`), `drafts` (`/api/drafts`), `chat` (`POST /api/chat`). `deps.py`: DB session and `current_user` (401 without a valid session cookie) |
+| `services/database.py`  | SQLite via SQLModel, deleted and recreated on every startup |
+| `services/auth.py`      | Sign up (Argon2 password hashes), sign in, session tokens |
+| `services/drafts.py`    | A user's saved drafts; every query is scoped to the owner |
 | `services/documents.py` | Loads `templates/documents.json`: the supported documents, their parties and cover page fields |
 | `services/chat.py`      | Chat flow: pick a document, then draft it with a response schema built per document; `respond()` |
 | `services/prompts.py`   | Selection and drafting system prompts |
-| `models/`               | Pydantic schemas: `base` (camelCase), `chat` (request/response), `document` (registry specs, parties) |
+| `models/`               | SQLModel tables (`user`: `User`, `AuthSession`; `draft`: `Draft`) and Pydantic schemas (`base`, `chat`, `document`) |
 | `core/config.py`        | `Settings`, read from `PRELEGAL_*` env vars |
 | `core/llm.py`           | `complete_structured()`: LiteLLM via OpenRouter (Cerebras), Structured Outputs. Needs `OPENROUTER_API_KEY` |
 | `core/static.py`        | Serves the frontend export; HTML pages get `Cache-Control: no-cache` so browsers pick up new builds |

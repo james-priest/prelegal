@@ -4,10 +4,12 @@ from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlmodel import Session
 
 from core import llm
 from core.config import Settings
 from main import create_app
+from services.database import init_db
 from services.documents import load_documents
 
 TEMPLATES_DIR = Path(__file__).parents[2] / "templates"
@@ -60,3 +62,22 @@ def stub_llm(monkeypatch):
 @pytest.fixture
 def templates_dir() -> Path:
     return TEMPLATES_DIR
+
+
+@pytest.fixture
+def password() -> str:
+    return "correct horse"
+
+
+@pytest.fixture
+def signed_in(client, password):
+    """The client, signed in as a new user."""
+    client.post("/api/auth/signup", json={"email": "ann@example.com", "password": password})
+    return client
+
+
+@pytest.fixture
+def db(tmp_path):
+    """A session on a fresh database."""
+    with Session(init_db(tmp_path / "test.db")) as session:
+        yield session

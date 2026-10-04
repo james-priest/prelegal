@@ -1,69 +1,58 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import Chat from "./Chat";
-import { GREETING } from "@/lib/chat";
-import { emptyDraft } from "@/lib/documents";
+import type { ChatMessage } from "@/lib/chat";
 
-function mockFetch(response: Response) {
-  const fetchMock = vi.fn().mockResolvedValue(response);
-  vi.stubGlobal("fetch", fetchMock);
-  return fetchMock;
-}
+const messages: ChatMessage[] = [
+  { role: "assistant", content: "What do you need?" },
+  { role: "user", content: "An NDA" },
+];
 
-function sendMessage(text: string) {
+function type(text: string) {
   fireEvent.change(screen.getByLabelText("Message"), { target: { value: text } });
-  fireEvent.click(screen.getByRole("button", { name: "Send" }));
 }
 
 describe("Chat", () => {
-  afterEach(() => {
-    cleanup();
-    vi.unstubAllGlobals();
+  afterEach(cleanup);
+
+  it("shows the conversation", () => {
+    render(<Chat messages={messages} onSend={vi.fn()} />);
+    expect(screen.getByText("What do you need?")).toBeTruthy();
+    expect(screen.getByText("An NDA")).toBeTruthy();
   });
 
-  it("opens with the greeting without calling the API", () => {
-    const fetchMock = mockFetch(new Response("{}"));
-    render(<Chat draft={emptyDraft} onResponse={() => {}} />);
-    expect(screen.getByText(GREETING)).toBeTruthy();
-    expect(fetchMock).not.toHaveBeenCalled();
+  it("sends the trimmed message and clears the input", async () => {
+    const onSend = vi.fn().mockResolvedValue(undefined);
+    render(<Chat messages={messages} onSend={onSend} />);
+    type("  Delaware law  ");
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    expect(onSend).toHaveBeenCalledWith("Delaware law");
+    expect((screen.getByLabelText("Message") as HTMLTextAreaElement).value).toBe("");
   });
 
-  it("sends the conversation and draft, shows the reply and reports the response", async () => {
-    const turn = { reply: "Which state's law?", documentId: "mutual-nda", fields: { purpose: "Joint venture" }, parties: {} };
-    const fetchMock = mockFetch(new Response(JSON.stringify(turn)));
-    const onResponse = vi.fn();
-    render(<Chat draft={emptyDraft} onResponse={onResponse} />);
-
-    sendMessage("A joint venture between Acme and Globex");
-
-    expect(await screen.findByText("Which state's law?")).toBeTruthy();
-    expect(screen.getByText("A joint venture between Acme and Globex")).toBeTruthy();
-    expect(onResponse).toHaveBeenCalledWith(turn);
-    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
-    expect(body.messages).toEqual([
-      { role: "assistant", content: GREETING },
-      { role: "user", content: "A joint venture between Acme and Globex" },
-    ]);
-    expect(body.documentId).toBeNull();
+  it("sends on Enter but not on Shift+Enter", () => {
+    const onSend = vi.fn().mockResolvedValue(undefined);
+    render(<Chat messages={messages} onSend={onSend} />);
+    type("Hello");
+    fireEvent.keyDown(screen.getByLabelText("Message"), { key: "Enter", shiftKey: true });
+    expect(onSend).not.toHaveBeenCalled();
+    fireEvent.keyDown(screen.getByLabelText("Message"), { key: "Enter" });
+    expect(onSend).toHaveBeenCalledWith("Hello");
   });
 
-  it("shows an error and restores the message when the request fails", async () => {
-    mockFetch(new Response("", { status: 500 }));
-    const onResponse = vi.fn();
-    render(<Chat draft={emptyDraft} onResponse={onResponse} />);
-
-    sendMessage("Hello");
-
+  it("restores the message and shows an error when sending fails", async () => {
+    render(<Chat messages={messages} onSend={vi.fn().mockRejectedValue(new Error("500"))} />);
+    type("Hello");
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
     expect(await screen.findByRole("alert")).toBeTruthy();
     expect((screen.getByLabelText("Message") as HTMLTextAreaElement).value).toBe("Hello");
-    expect(screen.queryByText("Hello", { selector: "p" })).toBeNull();
-    expect(onResponse).not.toHaveBeenCalled();
   });
 
   it("does not send blank messages", () => {
-    const fetchMock = mockFetch(new Response("{}"));
-    render(<Chat draft={emptyDraft} onResponse={() => {}} />);
-    sendMessage("   ");
-    expect(fetchMock).not.toHaveBeenCalled();
+    const onSend = vi.fn();
+    render(<Chat messages={messages} onSend={onSend} />);
+    type("   ");
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    expect(onSend).not.toHaveBeenCalled();
   });
 });
