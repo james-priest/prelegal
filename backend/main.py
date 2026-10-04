@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from api import chat, health
+from api import auth, chat, drafts, health
 from core.config import Settings
 from core.static import FrontendStaticFiles
 from services.database import init_db
@@ -16,13 +16,15 @@ def create_app(settings: Settings) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        init_db(settings.db_path)
+        app.state.engine = init_db(settings.db_path)
         yield
 
     app = FastAPI(title="Prelegal", lifespan=lifespan)
     app.state.documents = load_documents(settings.templates_dir / "documents.json")
     app.include_router(health.router)
+    app.include_router(auth.router)
     app.include_router(chat.router)
+    app.include_router(drafts.router)
 
     # Mounted last so /api routes take precedence. Absent until the frontend is built.
     if settings.static_dir.is_dir():

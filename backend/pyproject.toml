@@ -7,10 +7,13 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "email-validator>=2.3.0",
     "fastapi>=0.142.2",
     "litellm>=1.104.0",
+    "pwdlib[argon2]>=0.3.1",
     "pydantic>=2.13.5",
     "pydantic-settings>=2.15.0",
+    "sqlmodel>=0.0.47",
     "uvicorn[standard]>=0.54.0",
 ]
 

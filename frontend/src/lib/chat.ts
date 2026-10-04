@@ -4,6 +4,7 @@
  * filled in.
  */
 
+import { api } from "@/lib/api";
 import { emptyDraft, partyOf, todayIso, type DraftState, type Party } from "@/lib/documents";
 
 export interface ChatMessage {
@@ -37,12 +38,6 @@ export function applyResponse(state: DraftState, response: ChatResponse): DraftS
  * Sends the conversation, the draft and the user's local date (the server's
  * clock may be in another time zone); returns the assistant's turn.
  */
-export async function sendChat(messages: ChatMessage[], state: DraftState): Promise<ChatResponse> {
-  const response = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...state, messages, today: todayIso() }),
-  });
-  if (!response.ok) throw new Error(`Chat request failed (${response.status})`);
-  return response.json();
+export function sendChat(messages: ChatMessage[], state: DraftState): Promise<ChatResponse> {
+  return api<ChatResponse>("/api/chat", { method: "POST", body: { ...state, messages, today: todayIso() } });
 }

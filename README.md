@@ -5,8 +5,9 @@ A platform for drafting common legal agreements
 
 ## Features
 
-- **Sign in** — placeholder login screen (no authentication yet).
+- **Accounts** — sign up and sign in with email and password. Accounts and drafts live in a temporary database that resets when the server restarts.
 - **Agreement drafting** — tell an AI assistant what you need; it picks one of 11 Common Paper documents (NDA, cloud service, pilot, partnership and more), or suggests the closest one if yours isn't supported, then fills it in as you answer. Download it as a PDF.
+- **Your documents** — every draft is saved after each chat turn; reopen one to keep editing or download it. Drafts are marked as subject to legal review.
 
 ## Running
 

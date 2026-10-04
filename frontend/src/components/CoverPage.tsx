@@ -61,6 +61,11 @@ export default function CoverPage({ doc, draft }: { doc: DocumentSpec; draft: Dr
         </tbody>
       </table>
 
+      <p className="doc-disclaimer">
+        Draft prepared with Prelegal. This document is a draft and is subject to legal review before
+        anyone signs or relies on it.
+      </p>
+
       <p className="doc-attribution">
         Common Paper {doc.name} free to use under{" "}
         <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
