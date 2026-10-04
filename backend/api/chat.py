@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from app.models.nda import ChatTurn, NdaChatRequest
-from app.services import nda_chat
+from models.nda import ChatTurn, NdaChatRequest
+from services import nda_chat
 
 router = APIRouter(prefix="/api")
 

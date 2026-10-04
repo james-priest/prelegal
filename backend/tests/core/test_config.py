@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app.core.config import Settings
+from core.config import Settings
 
 
 def test_settings_read_prelegal_env_vars(monkeypatch):

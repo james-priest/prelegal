@@ -4,9 +4,9 @@ from types import SimpleNamespace
 import pytest
 from fastapi.testclient import TestClient
 
-from app.core import llm
-from app.core.config import Settings
-from app.main import create_app
+from core import llm
+from core.config import Settings
+from main import create_app
 
 
 @pytest.fixture
@@ -44,3 +44,41 @@ def stub_llm(monkeypatch):
         return calls
 
     return stub
+
+
+@pytest.fixture
+def nda_fields() -> dict:
+    """Blank NDA cover page fields, as the frontend sends them."""
+    party = {"name": "", "title": "", "company": "", "noticeAddress": ""}
+    return {
+        "purpose": "",
+        "effectiveDate": "",
+        "mndaTermType": "fixed",
+        "mndaTermYears": 1,
+        "confidentialityTermType": "fixed",
+        "confidentialityTermYears": 1,
+        "governingLaw": "",
+        "jurisdiction": "",
+        "modifications": "",
+        "party1": party,
+        "party2": dict(party),
+    }
+
+
+@pytest.fixture
+def llm_turn() -> dict:
+    """A valid LLM response for an NDA chat turn."""
+    return {
+        "reply": "Thanks! Which state's law should govern?",
+        "fields": {
+            "purpose": "Joint venture",
+            "effectiveDate": "2026-10-04",
+            "party1": {"company": "Acme Inc"},
+        },
+    }
+
+
+@pytest.fixture
+def llm_calls(stub_llm, llm_turn):
+    """Stubs the LLM with `llm_turn`; returns the recorded call kwargs."""
+    return stub_llm(llm_turn)

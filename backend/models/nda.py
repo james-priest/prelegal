@@ -5,8 +5,8 @@ from typing import Literal
 
 from pydantic import Field
 
-from app.models.base import CamelModel
-from app.models.chat import Message
+from models.base import CamelModel
+from models.chat import Message
 
 MndaTermType = Literal["fixed", "untilTerminated"]
 ConfidentialityTermType = Literal["fixed", "perpetual"]

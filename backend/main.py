@@ -5,9 +5,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.core.config import Settings
-from app.core.database import init_db
-from app.routes import chat, health
+from core.config import Settings
+from services.database import init_db
+from api import chat, health
 
 
 def create_app(settings: Settings) -> FastAPI:

@@ -2,9 +2,9 @@
 
 from datetime import date
 
-from app.core import llm
-from app.models.chat import Message
-from app.models.nda import ChatTurn, NdaFields
+from core import llm
+from models.chat import Message
+from models.nda import ChatTurn, NdaFields
 
 SYSTEM_PROMPT = """\
 You are Prelegal's assistant, helping the user draft a Common Paper Mutual \
