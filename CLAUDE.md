@@ -64,7 +64,7 @@ Implemented (PL-2 to PL-5):
 
 - Templates: Common Paper templates in `templates/`, listed in `catalog.json`.
 - Frontend: Next.js static export. `/` is a fake sign-in page (no authentication, submit goes to `/nda/`). `/nda/` is the Mutual NDA creator: AI chat (`NdaChat`, `lib/chat.ts`) beside a live preview, PDF download via print. Brand colors are Tailwind tokens (`brand-*`) in `globals.css`. Tests: `npm test` (Vitest).
-- Backend: `backend/src/prelegal_backend/` with `main.py` (app factory, `GET /api/health`, `POST /api/chat`, static mount), `nda_chat.py` (system prompt, LiteLLM Structured Outputs call returning a reply plus nullable field updates) and `db.py` (recreates SQLite at startup with an empty `users` table). Env vars: `PRELEGAL_DB_PATH`, `PRELEGAL_STATIC_DIR`. Tests: `uv run pytest`.
+- Backend: layers directly under `backend/`, run as `uvicorn main:app`. `main.py` (app factory), `api/` (routers: `GET /api/health`, `POST /api/chat`), `services/` (`database.py` recreates SQLite at startup with an empty `users` table; `nda_chat.py` system prompt and `respond()`, returning a reply plus nullable field updates), `models/` (Pydantic schemas: `base`, `chat`, `nda`), `core/` (`config.py` Settings, `llm.py` `complete_structured()` via LiteLLM/Cerebras). `tests/` mirrors the layout. New documents add `models/<doc>.py`, `services/<doc>_chat.py` and a router in `api/`. Env vars: `PRELEGAL_DB_PATH`, `PRELEGAL_STATIC_DIR`. Tests: `uv run pytest`.
 - Docker: multi-stage `Dockerfile`. Start/stop scripts in `scripts/` pass `.env` to the container when it exists.
 
 Not yet implemented: real sign up/sign in and documents other than the Mutual NDA.

@@ -10,15 +10,15 @@ dependencies = [
     "fastapi>=0.142.2",
     "litellm>=1.104.0",
     "pydantic>=2.13.5",
+    "pydantic-settings>=2.15.0",
     "uvicorn[standard]>=0.54.0",
 ]
-
-[build-system]
-requires = ["uv_build>=0.12.19,<0.13.0"]
-build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
     "httpx2>=2.13.1",
     "pytest>=9.1.1",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
