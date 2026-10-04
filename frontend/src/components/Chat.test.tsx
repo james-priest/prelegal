@@ -15,6 +15,11 @@ function type(text: string) {
 describe("Chat", () => {
   afterEach(cleanup);
 
+  it("focuses the message input when it opens", () => {
+    render(<Chat messages={messages} onSend={vi.fn()} />);
+    expect(document.activeElement).toBe(screen.getByLabelText("Message"));
+  });
+
   it("shows the conversation", () => {
     render(<Chat messages={messages} onSend={vi.fn()} />);
     expect(screen.getByText("What do you need?")).toBeTruthy();
