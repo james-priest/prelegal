@@ -2,12 +2,21 @@
 
 import os
 from contextlib import asynccontextmanager
+from datetime import date
 from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
+from prelegal_backend import nda_chat
 from prelegal_backend.db import init_db
+
+
+class ChatRequest(BaseModel):
+    messages: list[nda_chat.Message]
+    fields: nda_chat.NdaFields
+    today: date
 
 
 def create_app(db_path: Path, static_dir: Path) -> FastAPI:
@@ -24,6 +33,11 @@ def create_app(db_path: Path, static_dir: Path) -> FastAPI:
     def health() -> dict[str, str]:
         """Liveness check."""
         return {"status": "ok"}
+
+    @app.post("/api/chat")
+    def chat(request: ChatRequest) -> nda_chat.ChatTurn:
+        """Next assistant reply and field updates for the NDA conversation."""
+        return nda_chat.respond(request.messages, request.fields, request.today)
 
     # Mounted last so /api routes take precedence. Absent until the frontend is built.
     if static_dir.is_dir():

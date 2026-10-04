@@ -3,20 +3,14 @@
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
 import CoverPage from "@/components/CoverPage";
-import NdaForm from "@/components/NdaForm";
+import NdaChat from "@/components/NdaChat";
 import StandardTerms from "@/components/StandardTerms";
-import {
-  defaultFormData,
-  documentFileName,
-  todayIso,
-  type NdaFormData,
-  type PartyInfo,
-  type PartyKey,
-} from "@/lib/nda";
+import { applyUpdates, type FieldUpdates } from "@/lib/chat";
+import { defaultFormData, documentFileName, todayIso, type NdaFormData } from "@/lib/nda";
 
 const noopSubscribe = () => () => {};
 
-/** Form + live document preview. "Download PDF" prints only the document. */
+/** AI chat + live document preview. "Download PDF" prints only the document. */
 export default function NdaBuilder({ standardTerms }: { standardTerms: string }) {
   const [formData, setData] = useState<NdaFormData>(defaultFormData);
 
@@ -25,12 +19,8 @@ export default function NdaBuilder({ standardTerms }: { standardTerms: string })
   const today = useSyncExternalStore(noopSubscribe, todayIso, () => "");
   const data = formData.effectiveDate ? formData : { ...formData, effectiveDate: today };
 
-  function updateField<K extends keyof NdaFormData>(field: K, value: NdaFormData[K]) {
-    setData((d) => ({ ...d, [field]: value }));
-  }
-
-  function updateParty(party: PartyKey, field: keyof PartyInfo, value: string) {
-    setData((d) => ({ ...d, [party]: { ...d[party], [field]: value } }));
+  function updateFields(updates: FieldUpdates) {
+    setData((d) => applyUpdates(d, updates));
   }
 
   function downloadPdf() {
@@ -63,12 +53,14 @@ export default function NdaBuilder({ standardTerms }: { standardTerms: string })
       </header>
 
       <main className="grid flex-1 lg:grid-cols-[minmax(22rem,28rem)_1fr] print:block">
-        <aside className="border-b border-stone-200 bg-white p-6 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:border-r lg:border-b-0 print:hidden">
-          <p className="mb-6 text-sm text-stone-600">
-            Fill in the details below. The agreement updates as you type; use{" "}
+        <aside className="flex h-[70vh] flex-col border-b border-stone-200 bg-white p-6 lg:sticky lg:top-0 lg:h-screen lg:border-r lg:border-b-0 print:hidden">
+          <p className="mb-4 text-sm text-stone-600">
+            Chat with the assistant and the agreement fills in as you go; use{" "}
             <strong>Download PDF</strong> and choose “Save as PDF” to keep a copy.
           </p>
-          <NdaForm data={data} onChange={updateField} onPartyChange={updateParty} />
+          <div className="min-h-0 flex-1">
+            <NdaChat data={data} onUpdate={updateFields} />
+          </div>
         </aside>
 
         <div className="p-4 sm:p-8 print:p-0">
