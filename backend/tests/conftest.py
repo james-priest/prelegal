@@ -19,6 +19,8 @@ def settings(tmp_path):
     (out / "draft").mkdir(parents=True)
     (out / "index.html").write_text("<h1>Sign in</h1>")
     (out / "draft" / "index.html").write_text("<h1>Draft</h1>")
+    (out / "_next" / "static").mkdir(parents=True)
+    (out / "_next" / "static" / "app.js").write_text("console.log(1)")
     return Settings(db_path=tmp_path / "data" / "prelegal.db", static_dir=out, templates_dir=TEMPLATES_DIR)
 
 

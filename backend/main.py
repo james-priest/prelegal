@@ -3,10 +3,10 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 
 from api import chat, health
 from core.config import Settings
+from core.static import FrontendStaticFiles
 from services.database import init_db
 from services.documents import load_documents
 
@@ -26,7 +26,7 @@ def create_app(settings: Settings) -> FastAPI:
 
     # Mounted last so /api routes take precedence. Absent until the frontend is built.
     if settings.static_dir.is_dir():
-        app.mount("/", StaticFiles(directory=settings.static_dir, html=True), name="frontend")
+        app.mount("/", FrontendStaticFiles(directory=settings.static_dir, html=True), name="frontend")
 
     return app
 

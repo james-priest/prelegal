@@ -21,6 +21,7 @@ Code is organized by layer: `api` calls `services`, which use `models` and `core
 | `models/`               | Pydantic schemas: `base` (camelCase), `chat` (request/response), `document` (registry specs, parties) |
 | `core/config.py`        | `Settings`, read from `PRELEGAL_*` env vars |
 | `core/llm.py`           | `complete_structured()`: LiteLLM via OpenRouter (Cerebras), Structured Outputs. Needs `OPENROUTER_API_KEY` |
+| `core/static.py`        | Serves the frontend export; HTML pages get `Cache-Control: no-cache` so browsers pick up new builds |
 
 A new document type is a template in `templates/` plus an entry in `templates/documents.json`; no code changes.
 
