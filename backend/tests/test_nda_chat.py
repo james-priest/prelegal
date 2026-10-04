@@ -1,11 +1,6 @@
-import json
-from types import SimpleNamespace
-
 import pytest
-from fastapi.testclient import TestClient
 
-from prelegal_backend import nda_chat
-from prelegal_backend.main import create_app
+from app.models.nda import ChatTurn
 
 EMPTY_PARTY = {"name": "", "title": "", "company": "", "noticeAddress": ""}
 FIELDS = {
@@ -31,30 +26,9 @@ LLM_JSON = {
 }
 
 
-def stub_llm(monkeypatch, output: dict) -> list[dict]:
-    """Replaces the LLM with a stub returning `output`; returns the recorded call kwargs."""
-    calls = []
-
-    def fake_completion(**kwargs):
-        calls.append(kwargs)
-        message = SimpleNamespace(content=json.dumps(output))
-        return SimpleNamespace(choices=[SimpleNamespace(message=message)])
-
-    monkeypatch.setattr(nda_chat, "completion", fake_completion)
-    return calls
-
-
 @pytest.fixture
-def llm_calls(monkeypatch):
-    return stub_llm(monkeypatch, LLM_JSON)
-
-
-@pytest.fixture
-def client(tmp_path):
-    # Server errors become 500 responses, as in production, instead of raising.
-    app = create_app(tmp_path / "test.db", tmp_path / "missing")
-    with TestClient(app, raise_server_exceptions=False) as c:
-        yield c
+def llm_calls(stub_llm):
+    return stub_llm(LLM_JSON)
 
 
 def post_chat(client, messages):
@@ -96,7 +70,7 @@ def test_chat_uses_structured_output_via_cerebras(client, llm_calls):
     post_chat(client, [{"role": "user", "content": "hi"}])
     kwargs = llm_calls[0]
     assert kwargs["model"] == "openrouter/openai/gpt-oss-120b"
-    assert kwargs["response_format"] is nda_chat.ChatTurn
+    assert kwargs["response_format"] is ChatTurn
     assert kwargs["extra_body"] == {"provider": {"order": ["cerebras"]}}
 
 
@@ -106,7 +80,7 @@ def test_chat_rejects_invalid_role(client, llm_calls):
     assert llm_calls == []
 
 
-def test_chat_fails_on_invalid_llm_date(client, monkeypatch):
-    stub_llm(monkeypatch, {"reply": "Done", "fields": {"effectiveDate": "2026-13-45"}})
+def test_chat_fails_on_invalid_llm_date(client, stub_llm):
+    stub_llm({"reply": "Done", "fields": {"effectiveDate": "2026-13-45"}})
     response = post_chat(client, [{"role": "user", "content": "hi"}])
     assert response.status_code == 500

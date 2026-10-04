@@ -29,4 +29,4 @@ COPY --from=frontend /build/frontend/out /app/frontend/out
 
 ENV PATH="/app/backend/.venv/bin:$PATH"
 EXPOSE 8000
-CMD ["uvicorn", "prelegal_backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
