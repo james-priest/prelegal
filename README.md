@@ -6,11 +6,11 @@ A platform for drafting common legal agreements
 ## Features
 
 - **Sign in** — placeholder login screen (no authentication yet).
-- **Mutual NDA Creator** — fill in a form and download a completed Common Paper Mutual NDA as a PDF.
+- **Mutual NDA Creator** — chat with an AI assistant that fills in a Common Paper Mutual NDA as you answer, then download it as a PDF.
 
 ## Running
 
-Requires Docker. Optionally put `OPENROUTER_API_KEY` in `.env` at the project root (passed to the container when present), then:
+Requires Docker. Put `OPENROUTER_API_KEY` in `.env` at the project root (needed for the AI chat), then:
 
 ```bash
 scripts/start-mac.sh      # or start-linux.sh / start-windows.ps1
