@@ -10,7 +10,7 @@ A platform for drafting common legal agreements
 
 ## Running
 
-Requires Docker. Put `OPENROUTER_API_KEY` in `.env` at the project root (needed for the AI chat), then:
+Requires Docker. Copy `.env.example` to `.env` and set `OPENROUTER_API_KEY` (needed for the AI chat), then:
 
 ```bash
 scripts/start-mac.sh      # or start-linux.sh / start-windows.ps1
