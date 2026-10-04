@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
-import { GREETING, sendChat, type ChatMessage, type FieldUpdates } from "@/lib/chat";
-import type { NdaFormData } from "@/lib/nda";
+import { GREETING, sendChat, type ChatMessage, type ChatResponse } from "@/lib/chat";
+import type { DraftState } from "@/lib/documents";
 
-interface NdaChatProps {
-  data: NdaFormData;
-  onUpdate: (updates: FieldUpdates) => void;
+interface ChatProps {
+  draft: DraftState;
+  onResponse: (response: ChatResponse) => void;
 }
 
-/** Freeform chat with the AI, which fills in the NDA as the user answers. */
-export default function NdaChat({ data, onUpdate }: NdaChatProps) {
+/** Freeform chat with the AI, which picks a document and fills it in as the user answers. */
+export default function Chat({ draft, onResponse }: ChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([{ role: "assistant", content: GREETING }]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
@@ -33,8 +33,8 @@ export default function NdaChat({ data, onUpdate }: NdaChatProps) {
     setError("");
     setPending(true);
     try {
-      const turn = await sendChat(history, data);
-      onUpdate(turn.fields);
+      const turn = await sendChat(history, draft);
+      onResponse(turn);
       setMessages([...history, { role: "assistant", content: turn.reply }]);
     } catch {
       // Restore the unsent message so the user can retry.

@@ -1,7 +1,7 @@
 # Stage 1: build the Next.js frontend as a static export.
 FROM node:24-slim AS frontend
 WORKDIR /build
-# The NDA page reads ../templates at build time.
+# The /draft page reads ../templates (documents.json and the templates) at build time.
 COPY templates ./templates
 COPY frontend/package.json frontend/package-lock.json ./frontend/
 RUN cd frontend && npm ci
@@ -25,6 +25,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 COPY backend ./
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --locked
 
+COPY templates /app/templates
 COPY --from=frontend /build/frontend/out /app/frontend/out
 
 ENV PATH="/app/backend/.venv/bin:$PATH"

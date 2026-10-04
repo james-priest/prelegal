@@ -1,12 +1,12 @@
 # prelegal
 A platform for drafting common legal agreements
 
-> **🚧 Status: In progress** — this project is under active development and is expected to be completed by **October 7, 2026**.
+> **Status: In progress** — this project is under active development and is expected to be completed by **October 7, 2026**.
 
 ## Features
 
 - **Sign in** — placeholder login screen (no authentication yet).
-- **Mutual NDA Creator** — chat with an AI assistant that fills in a Common Paper Mutual NDA as you answer, then download it as a PDF.
+- **Agreement drafting** — tell an AI assistant what you need; it picks one of 11 Common Paper documents (NDA, cloud service, pilot, partnership and more), or suggests the closest one if yours isn't supported, then fills it in as you answer. Download it as a PDF.
 
 ## Running
 

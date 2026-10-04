@@ -1,8 +1,8 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import NdaChat from "./NdaChat";
+import Chat from "./Chat";
 import { GREETING } from "@/lib/chat";
-import { defaultFormData } from "@/lib/nda";
+import { emptyDraft } from "@/lib/documents";
 
 function mockFetch(response: Response) {
   const fetchMock = vi.fn().mockResolvedValue(response);
@@ -15,7 +15,7 @@ function sendMessage(text: string) {
   fireEvent.click(screen.getByRole("button", { name: "Send" }));
 }
 
-describe("NdaChat", () => {
+describe("Chat", () => {
   afterEach(() => {
     cleanup();
     vi.unstubAllGlobals();
@@ -23,45 +23,46 @@ describe("NdaChat", () => {
 
   it("opens with the greeting without calling the API", () => {
     const fetchMock = mockFetch(new Response("{}"));
-    render(<NdaChat data={defaultFormData} onUpdate={() => {}} />);
+    render(<Chat draft={emptyDraft} onResponse={() => {}} />);
     expect(screen.getByText(GREETING)).toBeTruthy();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("sends the conversation, shows the reply and applies field updates", async () => {
-    const fields = { purpose: "Joint venture" };
-    const fetchMock = mockFetch(new Response(JSON.stringify({ reply: "Which state's law?", fields })));
-    const onUpdate = vi.fn();
-    render(<NdaChat data={defaultFormData} onUpdate={onUpdate} />);
+  it("sends the conversation and draft, shows the reply and reports the response", async () => {
+    const turn = { reply: "Which state's law?", documentId: "mutual-nda", fields: { purpose: "Joint venture" }, parties: {} };
+    const fetchMock = mockFetch(new Response(JSON.stringify(turn)));
+    const onResponse = vi.fn();
+    render(<Chat draft={emptyDraft} onResponse={onResponse} />);
 
     sendMessage("A joint venture between Acme and Globex");
 
     expect(await screen.findByText("Which state's law?")).toBeTruthy();
     expect(screen.getByText("A joint venture between Acme and Globex")).toBeTruthy();
-    expect(onUpdate).toHaveBeenCalledWith(fields);
+    expect(onResponse).toHaveBeenCalledWith(turn);
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
     expect(body.messages).toEqual([
       { role: "assistant", content: GREETING },
       { role: "user", content: "A joint venture between Acme and Globex" },
     ]);
+    expect(body.documentId).toBeNull();
   });
 
   it("shows an error and restores the message when the request fails", async () => {
     mockFetch(new Response("", { status: 500 }));
-    const onUpdate = vi.fn();
-    render(<NdaChat data={defaultFormData} onUpdate={onUpdate} />);
+    const onResponse = vi.fn();
+    render(<Chat draft={emptyDraft} onResponse={onResponse} />);
 
     sendMessage("Hello");
 
     expect(await screen.findByRole("alert")).toBeTruthy();
     expect((screen.getByLabelText("Message") as HTMLTextAreaElement).value).toBe("Hello");
     expect(screen.queryByText("Hello", { selector: "p" })).toBeNull();
-    expect(onUpdate).not.toHaveBeenCalled();
+    expect(onResponse).not.toHaveBeenCalled();
   });
 
   it("does not send blank messages", () => {
     const fetchMock = mockFetch(new Response("{}"));
-    render(<NdaChat data={defaultFormData} onUpdate={() => {}} />);
+    render(<Chat draft={emptyDraft} onResponse={() => {}} />);
     sendMessage("   ");
     expect(fetchMock).not.toHaveBeenCalled();
   });
