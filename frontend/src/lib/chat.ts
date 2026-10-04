@@ -1,61 +1,47 @@
 /**
- * Client for the NDA chat API (POST /api/chat). The assistant replies with a
- * message plus field updates, where null means "leave unchanged".
+ * Client for the chat API (POST /api/chat). Each assistant turn returns a
+ * reply, the chosen document (if any) and the fields and party details it
+ * filled in.
  */
 
-import { clampYears, todayIso, type NdaFormData, type PartyInfo, type PartyKey } from "@/lib/nda";
+import { emptyDraft, partyOf, todayIso, type DraftState, type Party } from "@/lib/documents";
 
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
 
-type PartyUpdates = { [K in keyof PartyInfo]?: string | null };
-
-export type FieldUpdates = {
-  [K in Exclude<keyof NdaFormData, PartyKey>]?: NdaFormData[K] | null;
-} & { party1?: PartyUpdates; party2?: PartyUpdates };
-
-export interface ChatTurn {
+export interface ChatResponse {
   reply: string;
-  fields: FieldUpdates;
+  documentId: string | null;
+  fields: Record<string, string>;
+  parties: Record<string, Partial<Party>>;
 }
 
 /** Opening message, shown before any call to the API. */
 export const GREETING =
-  "Hi! I'll help you draft a Mutual NDA. To start, what is the purpose of the agreement, and which two companies are involved?";
+  "Hi! I'm Prelegal's assistant. I can draft NDAs, cloud service, pilot, partnership and other standard agreements. What do you need?";
 
-type NonNullFields<T> = { [K in keyof T]?: NonNullable<T[K]> };
-
-function withoutNulls<T extends object>(updates: T): NonNullFields<T> {
-  return Object.fromEntries(Object.entries(updates).filter(([, v]) => v != null)) as NonNullFields<T>;
-}
-
-/** Merges the assistant's non-null field updates into the form data. */
-export function applyUpdates(data: NdaFormData, updates: FieldUpdates): NdaFormData {
-  const { party1 = {}, party2 = {}, ...rest } = updates;
-  const next: NdaFormData = {
-    ...data,
-    ...withoutNulls(rest),
-    party1: { ...data.party1, ...withoutNulls(party1) },
-    party2: { ...data.party2, ...withoutNulls(party2) },
-  };
-  return {
-    ...next,
-    mndaTermYears: clampYears(next.mndaTermYears),
-    confidentialityTermYears: clampYears(next.confidentialityTermYears),
-  };
+/** Applies an assistant turn; switching documents starts from a blank draft. */
+export function applyResponse(state: DraftState, response: ChatResponse): DraftState {
+  const base =
+    response.documentId === state.documentId ? state : { ...emptyDraft, documentId: response.documentId };
+  const parties = { ...base.parties };
+  for (const [key, updates] of Object.entries(response.parties)) {
+    parties[key] = { ...partyOf(base, key), ...updates };
+  }
+  return { documentId: base.documentId, fields: { ...base.fields, ...response.fields }, parties };
 }
 
 /**
- * Sends the conversation, current fields and the user's local date (the
- * server's clock may be in another time zone); returns the assistant's turn.
+ * Sends the conversation, the draft and the user's local date (the server's
+ * clock may be in another time zone); returns the assistant's turn.
  */
-export async function sendChat(messages: ChatMessage[], fields: NdaFormData): Promise<ChatTurn> {
+export async function sendChat(messages: ChatMessage[], state: DraftState): Promise<ChatResponse> {
   const response = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages, fields, today: todayIso() }),
+    body: JSON.stringify({ ...state, messages, today: todayIso() }),
   });
   if (!response.ok) throw new Error(`Chat request failed (${response.status})`);
   return response.json();

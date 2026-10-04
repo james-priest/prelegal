@@ -1,12 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Request
 
-from models.nda import ChatTurn, NdaChatRequest
-from services import nda_chat
+from models.chat import ChatRequest, ChatResponse
+from services import chat as chat_service
 
 router = APIRouter(prefix="/api")
 
 
 @router.post("/chat")
-def chat(request: NdaChatRequest) -> ChatTurn:
-    """Next assistant reply and field updates for the NDA conversation."""
-    return nda_chat.respond(request.messages, request.fields, request.today)
+def chat(body: ChatRequest, request: Request) -> ChatResponse:
+    """Next assistant reply, chosen document and field updates."""
+    documents = request.app.state.documents
+    if body.document_id is not None and body.document_id not in documents:
+        raise HTTPException(status_code=422, detail=f"Unknown document: {body.document_id}")
+    return chat_service.respond(body, documents)

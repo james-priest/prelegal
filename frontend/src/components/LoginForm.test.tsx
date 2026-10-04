@@ -14,7 +14,7 @@ describe("LoginForm", () => {
     fireEvent.change(screen.getByLabelText("Email"), { target: { value: "a@example.com" } });
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "anything" } });
     fireEvent.submit(screen.getByRole("button", { name: "Sign in" }));
-    expect(push).toHaveBeenCalledWith("/nda/");
+    expect(push).toHaveBeenCalledWith("/draft/");
   });
 
   it("requires email and password", () => {

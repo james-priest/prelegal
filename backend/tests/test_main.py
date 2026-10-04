@@ -14,6 +14,6 @@ def test_serves_login_page_at_root(client):
 
 
 def test_serves_nested_page(client):
-    response = client.get("/nda/")
+    response = client.get("/draft/")
     assert response.status_code == 200
-    assert "NDA" in response.text
+    assert "Draft" in response.text

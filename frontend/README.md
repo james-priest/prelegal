@@ -1,6 +1,6 @@
 # Prelegal frontend
 
-Next.js app for drafting legal agreements. It is statically exported (`out/`) and served by the backend. It currently provides a placeholder sign-in page (`/`) and the **Mutual NDA Creator** (`/nda/`): chat with an AI assistant that fills in the cover page, see the completed Common Paper Mutual NDA update live, and download it as a PDF.
+Next.js app for drafting legal agreements. It is statically exported (`out/`) and served by the backend. It provides a placeholder sign-in page (`/`) and the drafting page (`/draft/`): chat with an AI assistant that picks a supported document and fills in its cover page, see the completed agreement update live, and download it as a PDF.
 
 ## Getting started
 
@@ -21,11 +21,10 @@ npm run dev        # http://localhost:3000
 
 ## How it works
 
-- `src/app/page.tsx` + `src/components/LoginForm.tsx` — fake sign-in; submitting goes straight to `/nda/`.
-- `src/app/nda/page.tsx` — server component that reads `templates/Mutual-NDA.md` (the Standard Terms) and renders the builder.
-- `src/components/NdaBuilder.tsx` — holds the NDA field state; lays out the chat beside the live preview. **Download PDF** calls `window.print()`; print styles hide everything except the agreement, so users choose "Save as PDF".
-- `src/components/NdaChat.tsx` — the chat; each AI turn returns a reply plus field updates.
-- `src/lib/chat.ts` — `/api/chat` client and `applyUpdates` (merges non-null updates into the fields).
-- `src/components/CoverPage.tsx` — the filled-in cover page (mirrors `templates/Mutual-NDA-coverpage.md`).
-- `src/components/StandardTerms.tsx` — renders the Standard Terms markdown, substituting Governing Law and Jurisdiction into the `<span class="coverpage_link">` references. User input is rendered as text, never HTML.
-- `src/lib/nda.ts` — data model and pure helpers (unit tested in `nda.test.ts`).
+- `src/app/page.tsx` + `src/components/LoginForm.tsx` — fake sign-in; submitting goes straight to `/draft/`.
+- `src/app/draft/page.tsx` — server component that reads `templates/documents.json` (the supported documents) and each template's Standard Terms at build time, and renders the builder.
+- `src/components/DocumentBuilder.tsx` — holds the draft state (chosen document, fields, parties); lays out the chat beside the live preview. **Download PDF** calls `window.print()`; print styles hide everything except the agreement, so users choose "Save as PDF".
+- `src/components/Chat.tsx` — the chat; each AI turn returns a reply, the chosen document and field and party updates.
+- `src/components/CoverPage.tsx` — generic cover page: each key term with its value or a placeholder, and a signature block per party.
+- `src/components/StandardTerms.tsx` — renders a template's markdown. `<span class="…_link">` references show inline field values (the NDA's Governing Law and Jurisdiction) or render as defined terms. User input is rendered as text, never HTML.
+- `src/lib/documents.ts` — document and draft types and helpers; `src/lib/chat.ts` — `/api/chat` client and `applyResponse`.

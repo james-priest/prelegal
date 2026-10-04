@@ -10,3 +10,4 @@ class Settings(BaseSettings):
 
     db_path: Path = Path("data/prelegal.db")
     static_dir: Path = Path("../frontend/out")
+    templates_dir: Path = Path("../templates")
