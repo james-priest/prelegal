@@ -15,6 +15,10 @@ export default function Chat({ messages, onSend }: ChatProps) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Ready to type whenever the chat opens, including the remount after a chosen document is first saved.
+  useEffect(() => inputRef.current!.focus(), []);
 
   useEffect(() => {
     const list = listRef.current!;
@@ -73,6 +77,7 @@ export default function Chat({ messages, onSend }: ChatProps) {
         )}
         <div className="flex items-end gap-2">
           <textarea
+            ref={inputRef}
             rows={2}
             value={input}
             onChange={(e) => setInput(e.target.value)}
